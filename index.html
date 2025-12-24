@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>娛樂城名單</title>
+  <style>
+    body{font-family:system-ui,-apple-system;max-width:900px;margin:40px auto;padding:0 16px;line-height:1.6}
+    input{width:100%;padding:12px;font-size:16px;margin:12px 0}
+    .card{border:1px solid #ddd;border-radius:12px;padding:14px;margin:10px 0}
+    a{word-break:break-all}
+  </style>
+</head>
+<body>
+  <h1>娛樂城名單</h1>
+  <p>可搜尋名稱，點網址開啟。</p>
+
+  <input id="q" placeholder="輸入關鍵字搜尋，例如：豪神 / TU" />
+
+  <div id="list"></div>
+
+  <script>
+    const listEl = document.getElementById("list");
+    const qEl = document.getElementById("q");
+    let data = [];
+
+    function render() {
+      const q = qEl.value.trim().toLowerCase();
+      const filtered = data.filter(x => x.name.toLowerCase().includes(q));
+      listEl.innerHTML = filtered.map(x => `
+        <div class="card">
+          <div><strong>${x.name}</strong></div>
+          <div><a href="${x.url}" target="_blank" rel="noopener noreferrer">${x.url}</a></div>
+        </div>
+      `).join("") || "<p>查無結果</p>";
+    }
+
+    fetch("./data.json")
+      .then(r => r.json())
+      .then(json => {
+        // 去重（用 url 去重）
+        const seen = new Set();
+        data = json.filter(x => x.url && !seen.has(x.url) && seen.add(x.url));
+        render();
+      });
+
+    qEl.addEventListener("input", render);
+  </script>
+</body>
+</html>
